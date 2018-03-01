@@ -10,25 +10,29 @@ catch(Exception $e)
         die('Erreur : '.$e->getMessage());
 }
 
- if(isset($_POST['submit']) && !empty($_POST['tache'])){
+
 
 		$sanitize = filter_var($_POST['tache'], FILTER_SANITIZE_STRING);
-		$reponse = $bdd->query('SELECT * FROM tasks');
+		$reponse = $bdd->query('SELECT task FROM tasks');
 		$donnees = $reponse->fetch();
-	}
+
 
 		if (!empty($sanitize) && isset($sanitize) && $sanitize != $donnees['task']) {
 			$bdd->query('INSERT INTO tasks(task, archives) VALUES ("'.$sanitize.'", "false")');
 		}
 
 		$archives = $bdd->query('SELECT task FROM tasks WHERE archives = "false"');
-
-			if (isset($_POST['to_archive'])&& isset($_POST['case'])){
+		if (isset($_POST['to_archive'])&& isset($_POST['case'])){
 				for ($i = 0 ; $i < count($_POST['case']); $i++){
 						$bdd->exec('UPDATE tasks SET archives = "true" WHERE task = "'.$_POST['case'][$i].'"');
 					}
 				}
 
+				if(isset($_POST['clean']) &&  isset($_POST['test'])) {
+		        for ($a = 0; $a < count($_POST['test']); $a++) {
+		            $bdd->exec('DELETE FROM tasks WHERE task = "'.$_POST['test'][$a].'"');
+		        }
+		    }
 
 		$tobedone = $bdd->query('SELECT task FROM tasks WHERE archives = "false"');
 		$archived = $bdd->query('SELECT task FROM tasks WHERE archives = "true"');
